@@ -1,18 +1,6 @@
+/* Base styles for small devices (default) */
 html {
   font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
   position: relative;
   min-height: 100%;
 }
@@ -21,11 +9,81 @@ body {
   margin-bottom: 60px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+/* Form styles */
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+.btn:focus, 
+.btn:active:focus, 
+.btn-link.nav-link:focus, 
+.form-control:focus, 
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  html {
+    font-size: 16px; /* Larger font size for readability */
+  }
+
+  body {
+    margin-bottom: 80px; /* Increase bottom margin */
+  }
+
+  .form-floating > .form-control-plaintext::placeholder,
+  .form-floating > .form-control::placeholder {
+    text-align: center; /* Adjust alignment for tablets */
+  }
+}
+
+/* Large devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+  html {
+    font-size: 18px; /* Even larger font size for desktops */
+  }
+
+  body {
+    margin-bottom: 100px; /* Further increase bottom margin */
+  }
+
+  .form-floating > .form-control-plaintext::placeholder,
+  .form-floating > .form-control::placeholder {
+    text-align: left; /* Align placeholders for desktops */
+  }
+
+  .btn:focus,
+  .btn:active:focus,
+  .btn-link.nav-link:focus,
+  .form-control:focus,
+  .form-check-input:focus {
+    box-shadow: 0 0 0 0.15rem white, 0 0 0 0.35rem #1d72b8; /* Subtle adjustment */
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  html {
+    font-size: 20px; /* Maximum font size for very large screens */
+  }
+
+  body {
+    margin-bottom: 120px; /* Add more margin for extra large screens */
+  }
+
+  .btn:focus,
+  .btn:active:focus,
+  .btn-link.nav-link:focus,
+  .form-control:focus,
+  .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem white, 0 0 0 0.4rem #0d6efd; /* Sharper shadow effect */
+  }
 }

@@ -7,6 +7,19 @@ a.navbar-brand {
   word-break: break-all;
 }
 
+.navbar-items {
+  display:flex;
+  justify-content: flex-end;
+}
+
+.navbar-nav {
+  gap: 20px;
+}
+
+.navbar {
+  margin: auto 50px;
+}
+
 a {
   color: #0077cc;
 }

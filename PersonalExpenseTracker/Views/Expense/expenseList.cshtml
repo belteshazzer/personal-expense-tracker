@@ -1,0 +1,240 @@
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <link href="~/css/listStyle.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="container">
+
+        <div class="actions">
+            <div class="action-card" id="addExpenseBtn">
+                <img src="https://cdn-icons-png.flaticon.com/128/5501/5501400.png" alt="add">
+                <h6>add expense</h6>
+            </div>
+            <div class="action-card" id="addIncomeBtn">
+                <img src="https://cdn-icons-png.flaticon.com/128/4212/4212305.png" alt="add">
+                <h6>add income</h6>
+            </div>
+            <div class="action-card" id="viewSummaryBtn">
+                <img src="https://cdn-icons-png.flaticon.com/128/684/684831.png" alt="add">
+                <h6>view summary</h6>
+            </div>
+            <div class="action-card" id="viewReportBtn">
+                <img src="https://cdn-icons-png.flaticon.com/128/14234/14234658.png" alt="add">
+                <h6>view report</h6>
+            </div>
+        </div>
+        <div class="header">
+            <h1>Expenses List</h1>
+            <div class="balanceBox">
+                <h2>Current Balance:<span id="currentBalance">$0.00</span></h2>
+                <h3>Total Income: <span id="totalIncome">$0.00</span></h3>
+                <h3>Total Expenses: <span id="totalExpense">$0.00</span></h3>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="expensesTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">Please wait...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="expenseModal" class="add-transaction-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Expense</h2>
+                <span class="close" id="closeModalBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="Food">Food</option>
+                        <option value="Travel">Transport</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Health">Rent</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Others">Other</option>
+                    </select>
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" required>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" placeholder="Enter details about the expense"></textarea>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="closeFooterBtn" class="btn-cancel">Cancel</button>
+                <button id="saveExpenseBtn" class="btn-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("expenseModal");
+            const addExpenseBtn = document.getElementById("addExpenseBtn");
+            const closeModalBtn = document.getElementById("closeModalBtn");
+            const closeFooterBtn = document.getElementById("closeFooterBtn");
+            const saveExpenseBtn = document.getElementById("saveExpenseBtn");
+            const tableBody = document.querySelector("#expensesTable tbody");
+            let total_expense = 0;
+            let total_income = 0;
+
+            async function getTotalIncome(){
+
+                const response = await fetch("/api/Income/all");
+                const incomes = await response.json();
+                for (const income of incomes) {
+                    total_income += parseFloat(income.amount);
+                }
+            }
+
+            const formatter = new Intl.NumberFormat('en-US', { 
+                style: 'currency', 
+                currency: 'ETB', 
+                minimumFractionDigits: 2 
+            });
+
+            // Open modal
+            addExpenseBtn.addEventListener("click", () => {
+                modal.style.display = "block";
+            });
+
+            // Close modal
+            const closeModal = () => (modal.style.display = "none");
+            closeModalBtn.addEventListener("click", closeModal);
+            closeFooterBtn.addEventListener("click", closeModal);
+
+            window.addEventListener("click", (event) => {
+                if (event.target === modal) closeModal();
+            });
+
+            // Fetch and display expenses
+            async function fetchExpenses() {
+                try {
+
+                    await getTotalIncome();
+
+                    const response = await fetch("/api/expense/all");
+                    if (!response.ok) throw new Error("Failed to fetch expenses");
+
+                    const expenses = await response.json();
+                    if (!expenses.length) {
+                        tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">No expenses found.</td></tr>`;
+                        return;
+                    }
+
+                    tableBody.innerHTML = ""; // Clear table
+                    for (const expense of expenses) {
+
+                        total_expense += parseFloat(expense.amount);
+                        
+                        const row = `
+                            <tr>
+                                <td>${new Date(expense.date).toLocaleDateString()}</td>
+                                <td>${expense.category}</td>
+                                <td>$${expense.amount.toFixed(2)}</td>
+                                <td>${expense.description || "N/A"}</td>
+                                <td class="row-actions">
+                                    <i class="fas fa-edit" onclick="editExpense('${expense._id}')"></i>
+                                    <i class="fas fa-trash" onclick="deleteExpense('${expense._id}')"></i>
+                                </td>
+                            </tr>`;
+                        tableBody.innerHTML += row;
+                    }
+
+                    document.getElementById("totalIncome").innerHTML = formatter.format(total_income);
+                    document.getElementById("totalExpense").innerHTML = formatter.format(total_expense);
+                    document.getElementById("currentBalance").innerHTML = formatter.format(total_income - total_expense);
+
+                } catch (error) {
+                    console.error(error);
+                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Error loading expenses.</td></tr>`;
+                }
+            }
+
+            fetchExpenses();
+
+        });
+
+            // Save expense
+        saveExpenseBtn.addEventListener("click", async () => {
+            const form = document.getElementById("expenseForm");
+
+            const formData = new FormData(form);
+            const expense = {
+                _id: "",
+                date: new Date(formData.get("date")).toISOString(), // Converts to "2025-01-01T00:00:00.000Z"
+                category: formData.get("category"),
+                amount: parseFloat(formData.get("amount")), // Ensures the value is a number
+                description: formData.get("description") || "",
+            };
+            try {
+                const response = await fetch("api/Expense", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(expense),
+                });
+
+                if (!response.ok) throw new Error("Failed to save expense");
+
+                alert("Expense added successfully");
+                closeModal();
+                fetchExpenses();
+            } catch (error) {
+                console.error(error);
+                alert("Error saving expense");
+            }
+        });
+
+        // Edit and delete handlers
+        window.editExpense = (id) => alert(`Edit expense: ${id}`);
+
+        window.deleteExpense = async (id) => {
+            console.log("Deleting expense with ID:", id);
+            
+            if (!confirm("Are you sure you want to delete this expense?")) return;
+
+            try {
+                const response = await fetch(`/api/expense/${id}`, { method: "DELETE" });
+                if (!response.ok) throw new Error("Failed to delete expense");
+
+                alert("Expense deleted successfully");
+                fetchExpenses();
+            } catch (error) {
+                console.error(error);
+                alert("Error deleting expense");
+            }
+        };
+        
+    </script>
+</body>
+</html>

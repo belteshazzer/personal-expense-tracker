@@ -1,4 +1,5 @@
-using MongoDB.driver;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 
 namespace PersonalExpenseTracker.Data 
 {
@@ -11,7 +12,7 @@ namespace PersonalExpenseTracker.Data
             _database = client.GetDatabase(databaseName);
         }
 
-        public IMongoCollection<T> GetCollection (String collectionName){
+        public IMongoCollection<T> GetCollection<T> (String collectionName){
             return _database.GetCollection<T>(collectionName);
         }
     }

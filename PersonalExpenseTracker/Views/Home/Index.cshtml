@@ -1,8 +1,142 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<!DOCTYPE html>
+<html lang="en">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5fa;
+    }
+    .container {
+      padding: 20px;
+      width:100%;
+      margin: auto;
+      background-color: #fff;
+      border-radius: 12px;
+      @* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); *@
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items:start;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .tab-group {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .tab-group button {
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background-color: #f5f5fa;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+    .tab-group button.active {
+      background-color: orange;
+      color: white;
+    }
+
+    .chart {
+      height: 150px;
+      background: linear-gradient(180deg, #ffdfb4, #ffe1d9);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .defaultbutton{
+      background-color: rgb(179, 106, 247);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .spend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      @* gap: 15px; *@
+      justify-content: space-around;
+    }
+    .spend-card {
+      background-color: #f9f9fc;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .spend-card img {
+      width: 40px;
+      margin-bottom: 10px;
+    }
+    .spend-card .percentage {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .spend-card .category {
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal budget tracker</title>
+</head>
+<body>
+    <div class="container">
+    <div class="header">
+      <h1>Statistic</h1>
+    </div>
+    <div class="tab-group">
+      <button class="active" onclick="">Day</button>
+      <button onclick="">Week</button>
+      <button onclick="">Month</button>
+      <button onclick="">Year</button>
+    </div>
+    <div class="chart">
+      <!-- Placeholder for chart -->
+    </div>
+    <div>
+      <button class="defaultbutton" onclick="window.location.href='api/Expense/expenseList'">
+        see all expenses
+      </button>
+
+    </div>
+    <div class="spend">
+      <div class="spend-card">
+        <img src="https://img.icons8.com/ios/50/4a90e2/playstation.png" alt="PlayStation">
+        <div class="percentage">33%</div>
+        <div class="category">Playstation Store</div>
+      </div>
+      <div class="spend-card">
+        <img src="https://img.icons8.com/color/48/netflix.png" alt="Netflix">
+        <div class="percentage">20%</div>
+        <div class="category">Netflix</div>
+      </div>
+      <div class="spend-card">
+        <img src="https://img.icons8.com/color/48/starbucks.png" alt="Starbucks">
+        <div class="percentage">10%</div>
+        <div class="category">Coffee</div>
+      </div>
+      <div class="spend-card">
+        <img src="https://img.icons8.com/color/48/spotify.png" alt="Spotify">
+        <div class="percentage">40%</div>
+        <div class="category">Spotify Premium</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

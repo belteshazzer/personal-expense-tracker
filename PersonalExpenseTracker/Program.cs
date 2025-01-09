@@ -1,13 +1,19 @@
+using PersonalExpenseTracker.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.services.AddSingleton(so=>{
-    
+builder.Services.AddScoped<ExpenseRepository>();
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<IncomeRepository>();
+
+builder.Services.AddSingleton(so=>{
     var MongoConfig = builder.Configuration.GetSection ("MongoDB");
     return new MongoDBContext(
         MongoConfig["ConnectionString"],
-        MongoConfig["Database"]
+        MongoConfig["DatabaseName"]
      );
-})
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
