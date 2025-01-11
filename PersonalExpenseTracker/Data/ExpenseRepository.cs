@@ -108,5 +108,10 @@ namespace PersonalExpenseTracker.Data
         {
             return await _expense.Find(e => e.date.Date == date.Date).ToListAsync();
         }
+
+        public async Task<List<Expense>> GetExpenseByCategoryIdAsync(string categoryId)
+        {
+            return await _expense.Find(e => e.category == categoryId).ToListAsync();
+        }
     }
 }

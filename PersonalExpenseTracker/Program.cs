@@ -1,10 +1,12 @@
 using PersonalExpenseTracker.Data;
+using PersonalExpenseTracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<ExpenseRepository>();
 builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped<IncomeRepository>();
+builder.Services.AddScoped<StatisticsRepository>();
 
 builder.Services.AddSingleton(so=>{
     var MongoConfig = builder.Configuration.GetSection ("MongoDB");

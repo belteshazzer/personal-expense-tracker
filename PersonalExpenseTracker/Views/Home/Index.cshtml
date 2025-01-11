@@ -94,6 +94,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal budget tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -107,7 +108,7 @@
       <button onclick="">Year</button>
     </div>
     <div class="chart">
-      <!-- Placeholder for chart -->
+      <canvas id="chart"></canvas>
     </div>
     <div>
       <button class="defaultbutton" onclick="window.location.href='api/Expense/expenseList'">
@@ -115,28 +116,147 @@
       </button>
 
     </div>
-    <div class="spend">
-      <div class="spend-card">
-        <img src="https://img.icons8.com/ios/50/4a90e2/playstation.png" alt="PlayStation">
-        <div class="percentage">33%</div>
-        <div class="category">Playstation Store</div>
-      </div>
-      <div class="spend-card">
-        <img src="https://img.icons8.com/color/48/netflix.png" alt="Netflix">
-        <div class="percentage">20%</div>
-        <div class="category">Netflix</div>
-      </div>
-      <div class="spend-card">
-        <img src="https://img.icons8.com/color/48/starbucks.png" alt="Starbucks">
-        <div class="percentage">10%</div>
-        <div class="category">Coffee</div>
-      </div>
-      <div class="spend-card">
-        <img src="https://img.icons8.com/color/48/spotify.png" alt="Spotify">
-        <div class="percentage">40%</div>
-        <div class="category">Spotify Premium</div>
-      </div>
+    <div class="spend" id="spend">
+      <p>fetching category analysis ... </p>
+
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      try {
+        // Fetch data from the API
+        const response = await fetch('api/Statistics');
+        
+        // Check if the response is OK
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const statistics = await response.json();
+        const spend = document.getElementById('spend');
+        spend.innerHTML = ''; 
+        // Iterate over the statistics array
+        statistics.forEach((item) => {
+          const spendCard = document.createElement('div');
+          spendCard.classList.add('spend-card');
+          spendCard.innerHTML = `
+            <img src=${item.iconLink} alt="${item.category}" />
+            <div class="percentage">${parseFloat(item.percent).tofixed(2)}%</div>
+            <div class="category">${item.category}</div>
+          `;
+          spend.appendChild(spendCard);
+        });
+      } catch (error) {
+        console.error('Error fetching statistics:', error);
+        const spend = document.getElementById('spend');
+        spend.innerHTML = `<p>Failed to fetch category analysis. Please try again later.</p>`;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      try {
+        // Fetch expenses and incomes data from API
+        const expensesResponse = await fetch('api/expense/all'); 
+        const incomesResponse = await fetch('api/income/all'); 
+
+        if (!expensesResponse.ok || !incomesResponse.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const expenses = await expensesResponse.json();
+        const incomes = await incomesResponse.json();
+
+        // Helper function to group data by date
+        function groupByDate(data) {
+          return data.reduce((acc, item) => {
+            const date = item.date;
+            acc[date] = (acc[date] || 0) + item.amount;
+            return acc;
+          }, {});
+        }
+
+        // Group expenses and incomes by date
+        const groupedExpenses = groupByDate(expenses);
+        const groupedIncomes = groupByDate(incomes);
+
+        console.log(groupedExpenses);
+        console.log(groupedIncomes);
+        
+        const allDates = Array.from(
+          new Set([...Object.keys(groupedExpenses), ...Object.keys(groupedIncomes)])
+        ).sort();
+
+        const expenseData = allDates.map((date) => groupedExpenses[date] || 0);
+        const incomeData = allDates.map((date) => groupedIncomes[date] || 0);
+
+
+        console.log('Grouped Expenses:', groupedExpenses);
+        console.log('Grouped Incomes:', groupedIncomes);
+        console.log('All Dates:', allDates);
+        console.log('Expense Data:', expenseData);
+        console.log('Income Data:', incomeData);
+
+
+        // Create the line chart
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: allDates, // X-axis labels (dates)
+            datasets: [
+              {
+                label: 'Expenses',
+                data: expenseData, // Y-axis data for expenses
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: true,
+                tension: 0.4,
+              },
+              {
+                label: 'Incomes',
+                data: incomeData, // Y-axis data for incomes
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date',
+                },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Amount',
+                },
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      } catch (error) {
+        console.error('Error fetching or processing data:', error);
+        const chartContainer = document.querySelector('.chart');
+        chartContainer.innerHTML = `<p>Failed to load chart data. Please try again later.</p>`;
+      }
+    });
+  </script>
 </body>
 </html>

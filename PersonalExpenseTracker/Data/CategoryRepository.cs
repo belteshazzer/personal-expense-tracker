@@ -12,10 +12,10 @@ namespace PersonalExpenseTracker.Data
             _category = dbContext.GetCollection<Category>("Category");
         }
 
-        // public async Task<List<Category>> GetAllCategoryAsync()
-        // {
-        //     return await _category.Find(_ => true).ToListAsync();
-        // }
+        public async Task<List<Category>> GetAllCategoryAsync()
+        {
+            return await _category.Find(_ => true).ToListAsync();
+        }
 
         // public async Task<Category> GetCategoryByIdAsync(string id)
         // {

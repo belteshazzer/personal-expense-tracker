@@ -11,6 +11,9 @@ namespace PersonalExpenseTracker.Models
 
         [BsonElement("name")]
         public string name {get; set;}
+
+        [BsonElement("iconLink")]
+        public string iconLink {get; set;}
     }
 }
 

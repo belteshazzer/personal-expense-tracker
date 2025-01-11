@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PersonalExpenseTracker.Data;
 using PersonalExpenseTracker.Models;
+using PersonalExpenseTracker.Services;
 
 
 namespace PersonalExpenseTracker.Controllers
@@ -12,10 +13,14 @@ namespace PersonalExpenseTracker.Controllers
 
         private readonly StatisticsRepository _statisticsRepository;
 
+        public StatisticsController(StatisticsRepository statisticsRepository) {
+            _statisticsRepository = statisticsRepository;
+        }
 
         [HttpGet]
-        public async Task<ActionResult<List<Statistics>>> getStatistics(){
-            await _statisticsRepository.findPercentageExpense();
+        public async Task<ActionResult<List<Statistics>>> GetStatistics(){
+            var statistics = await _statisticsRepository.FindPercentageExpenseAsync();
+            return Ok(statistics);
         }
     }
 }

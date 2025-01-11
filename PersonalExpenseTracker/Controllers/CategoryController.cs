@@ -15,10 +15,10 @@ namespace PersonalExpenseTracker.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        // [HttpGet("all")]
-        // public async Task<IActionResult> GetAllCategory(){
-        //     return Ok(await _categoryRepository.GetAllCategoryAsync());
-        // }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllCategory(){
+            return Ok(await _categoryRepository.GetAllCategoryAsync());
+        }
 
         // [HttpGet("{id}")]
         // public async Task<IActionResult> GetCategoryById([FromRoute] string id){
